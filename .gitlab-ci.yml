@@ -32,9 +32,9 @@ compile:
     KUBE_FASTBUILD: "false"
     KUBE_VERBOSE: "0"
     FEDERATION: "false"
-    KUBE_DOCKER_REGISTRY: "${CI_REGISTRY_IMAGE}"
-    KUBE_DOCKER_IMAGE_TAG: "${CI_COMMIT_REF_SLUG}.${CI_PIPELINE_ID}.${CI_COMMIT_SHA_SHORT}"
   script:
+    - export KUBE_DOCKER_REGISTRY="${CI_REGISTRY_IMAGE}"
+    - export KUBE_DOCKER_IMAGE_TAG="${CI_COMMIT_REF_SLUG}.${CI_PIPELINE_ID}.${CI_COMMIT_SHA_SHORT}"
     - apt update
     - apt install -y tar rsync git curl make file
     - echo "${KUBE_DOCKER_IMAGE_TAG}"
@@ -42,7 +42,6 @@ compile:
     - cp -a _output/dockerized/bin/linux/amd64 linux-amd64
     - echo export KUBELET_ARTIFACT="$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/linux-amd64/kubelet >> release.env
     - cat release.env
-    - docker images
   artifacts:
     name: "${CI_JOB_NAME}.${CI_PIPELINE_ID}.${CI_JOB_ID}"
     when: always
@@ -54,12 +53,10 @@ compile:
 container:
   image: crosscloudci/debian-docker
   stage: Package
-  variables:
-    KUBE_DOCKER_REGISTRY: "${CI_REGISTRY_IMAGE}"
-    KUBE_DOCKER_IMAGE_TAG: "${CI_COMMIT_REF_SLUG}.${CI_PIPELINE_ID}.${CI_COMMIT_SHA_SHORT}"
   script:
+    - export KUBE_DOCKER_REGISTRY="${CI_REGISTRY_IMAGE}"
+    - export KUBE_DOCKER_IMAGE_TAG="${CI_COMMIT_REF_SLUG}.${CI_PIPELINE_ID}.${CI_COMMIT_SHA_SHORT}"
     - echo "${KUBE_DOCKER_IMAGE_TAG}"
-    - docker images | grep kubernetes/kubernetes
     - docker login -u "gitlab-ci-token" -p "$CI_JOB_TOKEN" $CI_REGISTRY
     - docker push "$CI_REGISTRY_IMAGE/kube-apiserver-amd64:$KUBE_DOCKER_IMAGE_TAG"
     - docker push "$CI_REGISTRY_IMAGE/kube-controller-manager-amd64:$KUBE_DOCKER_IMAGE_TAG"
