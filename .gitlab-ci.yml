@@ -53,6 +53,8 @@ compile:
 container:
   image: crosscloudci/debian-docker
   stage: Package
+  dependencies: 
+    - compile
   script:
     - export KUBE_DOCKER_REGISTRY="${CI_REGISTRY_IMAGE}"
     - export KUBE_DOCKER_IMAGE_TAG="${CI_COMMIT_REF_SLUG}.${CI_PIPELINE_ID}.${CI_COMMIT_SHA_SHORT}"
