@@ -5,7 +5,6 @@ stages:
 
 before_script:
   - echo "Remove old Docker Images"
-  - docker rmi $(docker images) || true
   - echo "We are only going to build for amd64 for this demo"
   - sed -i -e '/ linux\/arm/ s/^/#/' hack/lib/golang.sh
   - sed -i -e '/ linux\/s390/ s/^/#/' hack/lib/golang.sh
@@ -43,6 +42,7 @@ compile:
     KUBE_VERBOSE: "0"
     FEDERATION: "false"
   script:
+    - docker rmi $(docker images) || true
     - export KUBE_DOCKER_REGISTRY="${CI_REGISTRY_IMAGE}"
     - export KUBE_DOCKER_IMAGE_TAG="${CI_COMMIT_REF_SLUG}.${CI_PIPELINE_ID}.${CI_COMMIT_SHA_SHORT}"
     - apt update
