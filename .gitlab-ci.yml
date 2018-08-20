@@ -77,7 +77,6 @@ container:
     - docker push "$CI_REGISTRY_IMAGE/kube-controller-manager-amd64:$KUBE_DOCKER_IMAGE_TAG"
     - docker push "$CI_REGISTRY_IMAGE/kube-scheduler-amd64:$KUBE_DOCKER_IMAGE_TAG"
     - docker push "$CI_REGISTRY_IMAGE/kube-proxy-amd64:$KUBE_DOCKER_IMAGE_TAG"
-    - docker push "$CI_REGISTRY_IMAGE/kube-aggregator-amd64:$KUBE_DOCKER_IMAGE_TAG"
     - docker push "$CI_REGISTRY_IMAGE/cloud-controller-manager-amd64:$KUBE_DOCKER_IMAGE_TAG"
     - echo export KUBE_APISERVER_IMAGE="$CI_REGISTRY_IMAGE/kube-apiserver-amd64" >> release.env
     - echo export KUBE_APISERVER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
@@ -87,8 +86,6 @@ container:
     - echo export KUBE_SCHEDULER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
     - echo export KUBE_PROXY_IMAGE="$CI_REGISTRY_IMAGE/kube-proxy-amd64" >> release.env
     - echo export KUBE_PROXY_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
-    - echo export KUBE_AGGREGATOR_IMAGE="$CI_REGISTRY_IMAGE/kube-aggregator-amd64" >> release.env
-    - echo export KUBE_AGGREGATOR_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
     - echo export CLOUD_CONTROLLER_IMAGE="$CI_REGISTRY_IMAGE/cloud-controller-manager-amd64" >> release.env
     - echo export CLOUD_CONTROLLER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
     - echo export DEPLOYMENT_SHA="${CI_PIPELINE_ID}" >> release.env
