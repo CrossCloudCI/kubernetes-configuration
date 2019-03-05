@@ -7,7 +7,8 @@ before_script:
   - echo "Remove old Docker Images"
   - echo "We are only going to build for amd64 for this demo"
   - >
-    if [ "$ARCH" == "arm" ]; then
+    if [ "$ARCH" == "arm64" ]; then
+       sed -i -e '/ linux\/arm/ s/^/#/' hack/lib/golang.sh
        sed -i -e '/ linux\/amd64/ s/^/#/' hack/lib/golang.sh
        sed -i -e '/ linux\/s390/ s/^/#/' hack/lib/golang.sh
        sed -i -e '/ linux\/386/ s/^/#/' hack/lib/golang.sh
@@ -27,6 +28,7 @@ before_script:
       sed -i -e '/ windows\/386/ s/^/#/' hack/lib/golang.sh
       sed -i -e '/ windows\/amd64/ s/^/#/' hack/lib/golang.sh
     fi
+  - sleep 10000
   - export BASE_URL=${BASE_URL:-$(echo $CI_PROJECT_URL |  cut -d'/' -f1-3)}
   - export CI_COMMIT_SHA_SHORT=$(echo ${CI_COMMIT_SHA} | cut -c -8)
   - >
