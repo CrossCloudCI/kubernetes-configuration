@@ -100,11 +100,11 @@ container:
     - docker login -u "gitlab-ci-token" -p "$CI_JOB_TOKEN" $CI_REGISTRY
     - >
       if [ "$ARCH" == "arm64" ]; then
-         docker push "$CI_REGISTRY_IMAGE/kube-apiserver-arm:$KUBE_DOCKER_IMAGE_TAG"
-         docker push "$CI_REGISTRY_IMAGE/kube-controller-manager-arm:$KUBE_DOCKER_IMAGE_TAG"
-         docker push "$CI_REGISTRY_IMAGE/kube-scheduler-arm:$KUBE_DOCKER_IMAGE_TAG"
-         docker push "$CI_REGISTRY_IMAGE/kube-proxy-arm:$KUBE_DOCKER_IMAGE_TAG"
-         docker push "$CI_REGISTRY_IMAGE/cloud-controller-manager-arm:$KUBE_DOCKER_IMAGE_TAG"
+         docker push "$CI_REGISTRY_IMAGE/kube-apiserver-arm64:$KUBE_DOCKER_IMAGE_TAG"
+         docker push "$CI_REGISTRY_IMAGE/kube-controller-manager-arm64:$KUBE_DOCKER_IMAGE_TAG"
+         docker push "$CI_REGISTRY_IMAGE/kube-scheduler-arm64:$KUBE_DOCKER_IMAGE_TAG"
+         docker push "$CI_REGISTRY_IMAGE/kube-proxy-arm64:$KUBE_DOCKER_IMAGE_TAG"
+         docker push "$CI_REGISTRY_IMAGE/cloud-controller-manager-arm64:$KUBE_DOCKER_IMAGE_TAG"
          echo export KUBE_APISERVER_IMAGE="$CI_REGISTRY_IMAGE/kube-apiserver-arm64" >> release.env
          echo export KUBE_APISERVER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
          echo export KUBE_CONTROLLER_MANAGER_IMAGE="$CI_REGISTRY_IMAGE/kube-controller-manager-arm64" >> release.env
