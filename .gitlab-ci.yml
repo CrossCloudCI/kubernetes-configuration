@@ -48,7 +48,7 @@ before_script:
 
 compile-aufs:
   tags:
-    - aufs
+    - overlayfs
   image: crosscloudci/debian-docker
   stage: Build
   variables:
