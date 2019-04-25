@@ -56,17 +56,25 @@ compile:
   script:
     - apt update
     - apt install -y tar rsync git curl make file net-tools
-    - source build/common.sh || true
-    - source build/lib/release.sh
-    - kube::build::verify_prereqs
-    - kube::build::build_image
-    - kube::build::run_build_command make kubelet KUBE_BUILD_PLATFORMS=linux/arm64
-    - kube::build::run_build_command make kube-controller-manager KUBE_BUILD_PLATFORMS=linux/arm64
-    - kube::build::run_build_command make kube-scheduler KUBE_BUILD_PLATFORMS=linux/arm64
-    - kube::build::run_build_command make kube-apiserver KUBE_BUILD_PLATFORMS=linux/arm64
-    - kube::build::run_build_command make kube-proxy KUBE_BUILD_PLATFORMS=linux/arm64
-    - kube::build::copy_output
-    - kube::release::build_server_images KUBE_BUILD_PLATFORMS=linux/arm64
+    # Write build script
+    - echo '#!/bin/bash' > kubernetes.sh
+    - echo 'set -o errexit' >> kubernetes.sh
+    - echo 'set -o nounset' >> kubernetes.sh
+    - echo 'set -o pipefail' >> kubernetes.sh
+    - echo 'source build/common.sh' >> kubernetes.sh
+    - echo 'source build/lib/release.sh' >> kubernetes.sh
+    - echo 'kube::build::verify_prereqs' >> kubernetes.sh
+    - echo 'kube::build::build_image' >> kubernetes.sh
+    - echo 'kube::build::run_build_command make kubelet KUBE_BUILD_PLATFORMS=linux/arm64' >> kubernetes.sh
+    - echo 'kube::build::run_build_command make kube-controller-manager KUBE_BUILD_PLATFORMS=linux/arm64' >> kubernetes.sh
+    - echo 'kube::build::run_build_command make kube-scheduler KUBE_BUILD_PLATFORMS=linux/arm64' >> kubernetes.sh
+    - echo 'kube::build::run_build_command make kube-apiserver KUBE_BUILD_PLATFORMS=linux/arm64' >> kubernetes.sh
+    - echo 'kube::build::run_build_command make kube-proxy KUBE_BUILD_PLATFORMS=linux/arm64' >> kubernetes.sh
+    - echo 'kube::build::copy_output' >> kubernetes.sh
+    - echo 'kube::release::build_server_images KUBE_BUILD_PLATFORMS=linux/arm64' >> kubernetes.sh
+    - chmod +x ./kubernetes.sh 
+    - ./kubernetes.sh
+    
   artifacts:
     name: "${CI_JOB_NAME}.${CI_PIPELINE_ID}.${CI_JOB_ID}"
     when: always
