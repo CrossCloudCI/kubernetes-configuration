@@ -56,7 +56,7 @@ compile:
   script:
     - apt update
     - apt install -y tar rsync git curl make file net-tools
-    - source build/common.sh
+    - source build/common.sh || true
     - source build/lib/release.sh
     - kube::build::verify_prereqs
     - kube::build::build_image
