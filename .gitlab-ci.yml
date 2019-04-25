@@ -60,6 +60,8 @@ compile:
     - echo 'source build/lib/release.sh' >> kubernetes.sh
     - echo 'kube::build::verify_prereqs' >> kubernetes.sh
     - echo 'kube::build::build_image' >> kubernetes.sh
+    - export KUBE_DOCKER_REGISTRY="${CI_REGISTRY_IMAGE}"
+    - export KUBE_DOCKER_IMAGE_TAG="${CI_COMMIT_REF_SLUG}.${CI_PIPELINE_ID}.${CI_COMMIT_SHA_SHORT}"
     - >
       if [ "$ARCH" == "arm64" ]; then
         echo 'ARCH set to arm64'
@@ -80,9 +82,17 @@ compile:
       if [ "$ARCH" == "arm64" ]; then
         echo 'ARCH set to arm64'
         cp -a _output/dockerized/bin/linux/arm64 linux-arm64
+        echo export KUBELET_ARTIFACT="$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/linux-arm64/kubelet >> release.env
+        echo export KUBE_APISERVER_ARTIFACT="$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/linux-arm64/kube-apiserver >> release.env
+        echo export KUBE_CONTROLLER_MANAGER_ARTIFACT="$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/linux-arm64/kube-controller-manager >> release.env
+        echo export KUBE_SCHEDULER_ARTIFACT="$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/linux-arm64/kube-scheduler >> release.env
       else
         echo 'Default to amd64 (Intel)'
         cp -a _output/dockerized/bin/linux/amd64 linux-amd64
+        echo export KUBELET_ARTIFACT="$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/linux-amd64/kubelet >> release.env
+        echo export KUBE_APISERVER_ARTIFACT="$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/linux-amd64/kube-apiserver >> release.env
+        echo export KUBE_CONTROLLER_MANAGER_ARTIFACT="$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/linux-amd64/kube-controller-manager >> release.env
+        echo export KUBE_SCHEDULER_ARTIFACT="$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/linux-amd64/kube-scheduler >> release.env
       fi
     
   artifacts:
