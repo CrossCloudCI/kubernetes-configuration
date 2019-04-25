@@ -65,14 +65,14 @@ compile:
     - echo 'source build/lib/release.sh' >> kubernetes.sh
     - echo 'kube::build::verify_prereqs' >> kubernetes.sh
     - echo 'kube::build::build_image' >> kubernetes.sh
-    - echo 'kube::build::run_build_command make kubelet KUBE_BUILD_PLATFORMS=linux/arm64' >> kubernetes.sh
-    - echo 'kube::build::run_build_command make kube-controller-manager KUBE_BUILD_PLATFORMS=linux/arm64' >> kubernetes.sh
-    - echo 'kube::build::run_build_command make kube-scheduler KUBE_BUILD_PLATFORMS=linux/arm64' >> kubernetes.sh
-    - echo 'kube::build::run_build_command make kube-apiserver KUBE_BUILD_PLATFORMS=linux/arm64' >> kubernetes.sh
-    - echo 'kube::build::run_build_command make kube-proxy KUBE_BUILD_PLATFORMS=linux/arm64' >> kubernetes.sh
-    - echo 'kube::build::run_build_command make cloud-controller-manager KUBE_BUILD_PLATFORMS=linux/arm64' >> kubernetes.sh
-    - echo 'kube::build::run_build_command make hyperkube KUBE_BUILD_PLATFORMS=linux/arm64' >> kubernetes.sh
-    - echo 'kube::build::run_build_command make conformance KUBE_BUILD_PLATFORMS=linux/arm64' >> kubernetes.sh
+    - echo 'kube::build::run_build_command make all KUBE_BUILD_PLATFORMS=linux/arm64' >> kubernetes.sh
+    # - echo 'kube::build::run_build_command make kubelet KUBE_BUILD_PLATFORMS=linux/arm64' >> kubernetes.sh
+    # - echo 'kube::build::run_build_command make kube-controller-manager KUBE_BUILD_PLATFORMS=linux/arm64' >> kubernetes.sh
+    # - echo 'kube::build::run_build_command make kube-scheduler KUBE_BUILD_PLATFORMS=linux/arm64' >> kubernetes.sh
+    # - echo 'kube::build::run_build_command make kube-apiserver KUBE_BUILD_PLATFORMS=linux/arm64' >> kubernetes.sh
+    # - echo 'kube::build::run_build_command make kube-proxy KUBE_BUILD_PLATFORMS=linux/arm64' >> kubernetes.sh
+    # - echo 'kube::build::run_build_command make cloud-controller-manager KUBE_BUILD_PLATFORMS=linux/arm64' >> kubernetes.sh
+    # - echo 'kube::build::run_build_command make hyperkube KUBE_BUILD_PLATFORMS=linux/arm64' >> kubernetes.sh
     - echo 'kube::build::copy_output' >> kubernetes.sh
     - echo 'kube::release::build_server_images KUBE_SERVER_PLATFORMS=linux/arm64' >> kubernetes.sh
     #Run Build
