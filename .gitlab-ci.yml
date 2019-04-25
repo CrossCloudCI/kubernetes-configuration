@@ -73,6 +73,7 @@ compile:
     - echo 'kube::build::copy_output' >> kubernetes.sh
     - echo 'kube::release::build_server_images KUBE_SERVER_PLATFORMS=linux/arm64' >> kubernetes.sh
     - chmod +x ./kubernetes.sh 
+    - sleep 10000000
     - ./kubernetes.sh
     
   artifacts:
