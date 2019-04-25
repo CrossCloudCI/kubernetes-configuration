@@ -69,8 +69,8 @@ container-aufs:
     - aufs
   image: crosscloudci/debian-docker
   stage: Package
-  dependencies: 
-    - compile-aufs
+  # dependencies: 
+  #   - compile-aufs
   script:
     - >
       if [ "$CI_COMMIT_REF_NAME" == "master" ]; then
@@ -131,8 +131,8 @@ container-overlayfs:
     - overlayfs
   image: crosscloudci/debian-docker
   stage: Package
-  dependencies: 
-    - compile-overlayfs
+  # dependencies: 
+  #   - compile-overlayfs
   script:
     - >
       if [ "$CI_COMMIT_REF_NAME" == "master" ]; then
