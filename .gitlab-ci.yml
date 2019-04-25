@@ -54,10 +54,22 @@ compile:
     # KUBE_VERBOSE: "0"
     # FEDERATION: "false"
   script:
+    - set -o errexit
+    - set -o nounset
+    - set -o pipefail
     - apt update
     - apt install -y tar rsync git curl make file net-tools
-    - sleep 100000000
-    - build/run.sh make kubelet KUBE_BUILD_PLATFORMS=linux/arm64
+    - source build/common.sh
+    - source build/lib/release.sh
+    - kube::build::verify_prereqs
+    - kube::build::build_image
+    - kube::build::run_build_command make kubelet KUBE_BUILD_PLATFORMS=linux/arm64
+    - kube::build::run_build_command make kube-controller-manager KUBE_BUILD_PLATFORMS=linux/arm64
+    - kube::build::run_build_command make kube-scheduler KUBE_BUILD_PLATFORMS=linux/arm64
+    - kube::build::run_build_command make kube-apiserver KUBE_BUILD_PLATFORMS=linux/arm64
+    - kube::build::run_build_command make kube-proxy KUBE_BUILD_PLATFORMS=linux/arm64
+    - kube::build::copy_output
+    - kube::release::build_server_images
   artifacts:
     name: "${CI_JOB_NAME}.${CI_PIPELINE_ID}.${CI_JOB_ID}"
     when: always
