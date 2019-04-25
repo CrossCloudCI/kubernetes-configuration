@@ -54,11 +54,12 @@ compile:
     # KUBE_VERBOSE: "0"
     # FEDERATION: "false"
   script:
+    - apt update
+    - apt install -y tar rsync git curl make file net-tools
+    - sleep 1000000
     - set -o errexit
     - set -o nounset
     - set -o pipefail
-    - apt update
-    - apt install -y tar rsync git curl make file net-tools
     - source build/common.sh
     - source build/lib/release.sh
     - kube::build::verify_prereqs
