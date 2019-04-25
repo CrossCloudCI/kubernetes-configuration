@@ -56,6 +56,7 @@ compile:
   script:
     - apt update
     - apt install -y tar rsync git curl make file net-tools
+    - sleep 100000000
     - build/run.sh make kubelet KUBE_BUILD_PLATFORMS=linux/arm64
   artifacts:
     name: "${CI_JOB_NAME}.${CI_PIPELINE_ID}.${CI_JOB_ID}"
