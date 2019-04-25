@@ -58,7 +58,6 @@ compile:
     - apt install -y tar rsync git curl make file net-tools
     - sleep 1000000
     - set -o errexit
-    - set -o nounset
     - set -o pipefail
     - source build/common.sh
     - source build/lib/release.sh
