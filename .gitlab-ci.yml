@@ -72,6 +72,7 @@ compile:
     - echo 'kube::build::run_build_command make kube-proxy KUBE_BUILD_PLATFORMS=linux/arm64' >> kubernetes.sh
     - echo 'kube::build::run_build_command make cloud-controller-manager KUBE_BUILD_PLATFORMS=linux/arm64' >> kubernetes.sh
     - echo 'kube::build::run_build_command make hyperkube KUBE_BUILD_PLATFORMS=linux/arm64' >> kubernetes.sh
+    - echo 'kube::build::run_build_command make conformance KUBE_BUILD_PLATFORMS=linux/arm64' >> kubernetes.sh
     - echo 'kube::build::copy_output' >> kubernetes.sh
     - echo 'kube::release::build_server_images KUBE_SERVER_PLATFORMS=linux/arm64' >> kubernetes.sh
     #Run Build
