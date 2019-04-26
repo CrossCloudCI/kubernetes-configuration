@@ -168,5 +168,6 @@ container:
 Dashboard:
   image: crosscloudci/debian-go
   stage: Update-Dashboard
+  dependencies: []
   script:
     - echo 'test'
