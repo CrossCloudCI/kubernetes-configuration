@@ -85,6 +85,11 @@ container:
     - docker login -u "gitlab-ci-token" -p "$CI_JOB_TOKEN" $CI_REGISTRY
     - apt update
     - apt install -y tar rsync git curl make file net-tools
+    # Write package script
+    - echo '#!/bin/bash' > kubernetes.sh
+    - echo 'set -o errexit' >> kubernetes.sh
+    - echo 'set -o nounset' >> kubernetes.sh
+    - echo 'set -o pipefail' >> kubernetes.sh
     - >
       if [ "$ARCH" == "arm64" ]; then
          echo "sed -i -e '/ linux\/arm$/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
@@ -131,11 +136,6 @@ container:
          echo export CLOUD_CONTROLLER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
          echo export DEPLOYMENT_SHA="${CI_PIPELINE_ID}" >> release.env
       fi
-    # Write package script
-    - echo '#!/bin/bash' > kubernetes.sh
-    - echo 'set -o errexit' >> kubernetes.sh
-    - echo 'set -o nounset' >> kubernetes.sh
-    - echo 'set -o pipefail' >> kubernetes.sh
     - echo 'source build/common.sh' >> kubernetes.sh
     - echo 'source build/lib/release.sh' >> kubernetes.sh
     - echo 'kube::build::verify_prereqs' >> kubernetes.sh
