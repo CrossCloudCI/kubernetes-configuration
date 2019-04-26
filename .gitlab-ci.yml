@@ -83,6 +83,8 @@ container:
     - export KUBE_DOCKER_IMAGE_TAG="${CI_COMMIT_REF_SLUG}.${CI_PIPELINE_ID}.${CI_COMMIT_SHA_SHORT}"
     - echo "${KUBE_DOCKER_IMAGE_TAG}"
     - docker login -u "gitlab-ci-token" -p "$CI_JOB_TOKEN" $CI_REGISTRY
+    - apt update
+    - apt install -y tar rsync git curl make file net-tools
     - >
       if [ "$ARCH" == "arm64" ]; then
          echo "sed -i -e '/ linux\/arm$/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
