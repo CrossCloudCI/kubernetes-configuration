@@ -92,6 +92,7 @@ container:
     - echo 'set -o pipefail' >> kubernetes.sh
     - >
       if [ "$ARCH" == "arm64" ]; then
+         echo 'ARCH set to arm64'
          echo "sed -i -e '/ linux\/arm$/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
          echo "sed -i -e '/ linux\/amd64/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
          echo "sed -i -e '/ linux\/s390/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
@@ -101,22 +102,42 @@ container:
          echo "sed -i -e '/ darwin\/386/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
          echo "sed -i -e '/ windows\/386/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
          echo "sed -i -e '/ windows\/amd64/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
-
-         # docker push "$CI_REGISTRY_IMAGE/kube-apiserver-arm64:$KUBE_DOCKER_IMAGE_TAG"
-         # docker push "$CI_REGISTRY_IMAGE/kube-controller-manager-arm64:$KUBE_DOCKER_IMAGE_TAG"
-         # docker push "$CI_REGISTRY_IMAGE/kube-scheduler-arm64:$KUBE_DOCKER_IMAGE_TAG"
-         # docker push "$CI_REGISTRY_IMAGE/kube-proxy-arm64:$KUBE_DOCKER_IMAGE_TAG"
-         # docker push "$CI_REGISTRY_IMAGE/cloud-controller-manager-arm64:$KUBE_DOCKER_IMAGE_TAG"
-         # echo export KUBE_APISERVER_IMAGE="$CI_REGISTRY_IMAGE/kube-apiserver-arm64" >> release.env
-         # echo export KUBE_APISERVER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
-         # echo export KUBE_CONTROLLER_MANAGER_IMAGE="$CI_REGISTRY_IMAGE/kube-controller-manager-arm64" >> release.env
-         # echo export KUBE_CONTROLLER_MANAGER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
-         # echo export KUBE_SCHEDULER_IMAGE="$CI_REGISTRY_IMAGE/kube-scheduler-arm64" >> release.env
-         # echo export KUBE_SCHEDULER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
-         # echo export KUBE_PROXY_IMAGE="$CI_REGISTRY_IMAGE/kube-proxy-arm64" >> release.env
-         # echo export KUBE_PROXY_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
-         # echo export CLOUD_CONTROLLER_IMAGE="$CI_REGISTRY_IMAGE/cloud-controller-manager-arm64" >> release.env
-         # echo export CLOUD_CONTROLLER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
+      else
+         echo 'Default to amd64 (Intel)'
+         sed -i -e '/ linux\/arm/ s/^/#/' hack/lib/golang.sh
+         sed -i -e '/ linux\/s390/ s/^/#/' hack/lib/golang.sh
+         sed -i -e '/ linux\/386/ s/^/#/' hack/lib/golang.sh
+         sed -i -e '/ linux\/ppc64le/ s/^/#/' hack/lib/golang.sh
+         sed -i -e '/ darwin\/amd64/ s/^/#/' hack/lib/golang.sh
+         sed -i -e '/ darwin\/386/ s/^/#/' hack/lib/golang.sh
+         sed -i -e '/ windows\/386/ s/^/#/' hack/lib/golang.sh
+         sed -i -e '/ windows\/amd64/ s/^/#/' hack/lib/golang.sh
+      fi
+    - echo 'source build/common.sh' >> kubernetes.sh
+    - echo 'source build/lib/release.sh' >> kubernetes.sh
+    - echo 'kube::build::verify_prereqs' >> kubernetes.sh
+    - echo 'kube::release::build_server_images' >> kubernetes.sh
+    # Run Package 
+    - chmod +x ./kubernetes.sh
+    - ./kubernetes.sh
+    - >
+      if [ "$ARCH" == "arm64" ]; then
+         echo 'ARCH set to arm64'
+         docker push "$CI_REGISTRY_IMAGE/kube-apiserver-arm64:$KUBE_DOCKER_IMAGE_TAG"
+         docker push "$CI_REGISTRY_IMAGE/kube-controller-manager-arm64:$KUBE_DOCKER_IMAGE_TAG"
+         docker push "$CI_REGISTRY_IMAGE/kube-scheduler-arm64:$KUBE_DOCKER_IMAGE_TAG"
+         docker push "$CI_REGISTRY_IMAGE/kube-proxy-arm64:$KUBE_DOCKER_IMAGE_TAG"
+         docker push "$CI_REGISTRY_IMAGE/cloud-controller-manager-arm64:$KUBE_DOCKER_IMAGE_TAG"
+         echo export KUBE_APISERVER_IMAGE="$CI_REGISTRY_IMAGE/kube-apiserver-arm64" >> release.env
+         echo export KUBE_APISERVER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
+         echo export KUBE_CONTROLLER_MANAGER_IMAGE="$CI_REGISTRY_IMAGE/kube-controller-manager-arm64" >> release.env
+         echo export KUBE_CONTROLLER_MANAGER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
+         echo export KUBE_SCHEDULER_IMAGE="$CI_REGISTRY_IMAGE/kube-scheduler-arm64" >> release.env
+         echo export KUBE_SCHEDULER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
+         echo export KUBE_PROXY_IMAGE="$CI_REGISTRY_IMAGE/kube-proxy-arm64" >> release.env
+         echo export KUBE_PROXY_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
+         echo export CLOUD_CONTROLLER_IMAGE="$CI_REGISTRY_IMAGE/cloud-controller-manager-arm64" >> release.env
+         echo export CLOUD_CONTROLLER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
       else
          echo 'No ARCH set, defaulting to amd64'
          docker push "$CI_REGISTRY_IMAGE/kube-apiserver-amd64:$KUBE_DOCKER_IMAGE_TAG"
@@ -134,15 +155,8 @@ container:
          echo export KUBE_PROXY_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
          echo export CLOUD_CONTROLLER_IMAGE="$CI_REGISTRY_IMAGE/cloud-controller-manager-amd64" >> release.env
          echo export CLOUD_CONTROLLER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
-         echo export DEPLOYMENT_SHA="${CI_PIPELINE_ID}" >> release.env
-      fi
-    - echo 'source build/common.sh' >> kubernetes.sh
-    - echo 'source build/lib/release.sh' >> kubernetes.sh
-    - echo 'kube::build::verify_prereqs' >> kubernetes.sh
-    - echo 'kube::release::build_server_images' >> kubernetes.sh
-    - chmod +x ./kubernetes.sh
-    - ./kubernetes.sh
-    - sleep 100000000
+       fi
+    - echo export DEPLOYMENT_SHA="${CI_PIPELINE_ID}" >> release.env
     - cat release.env
   artifacts:
     name: "${CI_JOB_NAME}.${CI_PIPELINE_ID}.${CI_JOB_ID}"
