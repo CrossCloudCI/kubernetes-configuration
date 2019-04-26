@@ -4,29 +4,6 @@ stages:
   - Update-Dashboard
 
 before_script:
-  - >
-    if [ "$ARCH" == "arm64" ]; then
-       echo 'ARCH set to arm64'
-       # sed -i -e '/ linux\/arm$/ s/^/#/' hack/lib/golang.sh
-       # sed -i -e '/ linux\/amd64/ s/^/#/' hack/lib/golang.sh
-       # sed -i -e '/ linux\/s390/ s/^/#/' hack/lib/golang.sh
-       # sed -i -e '/ linux\/386/ s/^/#/' hack/lib/golang.sh
-       # sed -i -e '/ linux\/ppc64le/ s/^/#/' hack/lib/golang.sh
-       # sed -i -e '/ darwin\/amd64/ s/^/#/' hack/lib/golang.sh
-       # sed -i -e '/ darwin\/386/ s/^/#/' hack/lib/golang.sh
-       # sed -i -e '/ windows\/386/ s/^/#/' hack/lib/golang.sh
-       # sed -i -e '/ windows\/amd64/ s/^/#/' hack/lib/golang.sh
-    else
-      echo 'Default to amd64 (Intel)'
-    #   sed -i -e '/ linux\/arm/ s/^/#/' hack/lib/golang.sh
-    #   sed -i -e '/ linux\/s390/ s/^/#/' hack/lib/golang.sh
-    #   sed -i -e '/ linux\/386/ s/^/#/' hack/lib/golang.sh
-    #   sed -i -e '/ linux\/ppc64le/ s/^/#/' hack/lib/golang.sh
-    #   sed -i -e '/ darwin\/amd64/ s/^/#/' hack/lib/golang.sh
-    #   sed -i -e '/ darwin\/386/ s/^/#/' hack/lib/golang.sh
-    #   sed -i -e '/ windows\/386/ s/^/#/' hack/lib/golang.sh
-    #   sed -i -e '/ windows\/amd64/ s/^/#/' hack/lib/golang.sh
-    fi
   - export BASE_URL=${BASE_URL:-$(echo $CI_PROJECT_URL |  cut -d'/' -f1-3)}
   - export CI_COMMIT_SHA_SHORT=$(echo ${CI_COMMIT_SHA} | cut -c -8)
   - >
