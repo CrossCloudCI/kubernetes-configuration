@@ -6,7 +6,7 @@ stages:
 before_script:
   - >
     if [ "$ARCH" == "arm64" ]; then
-       # echo 'ARCH set to arm64'
+       echo 'ARCH set to arm64'
        # sed -i -e '/ linux\/arm$/ s/^/#/' hack/lib/golang.sh
        # sed -i -e '/ linux\/amd64/ s/^/#/' hack/lib/golang.sh
        # sed -i -e '/ linux\/s390/ s/^/#/' hack/lib/golang.sh
