@@ -60,8 +60,8 @@ compile:
     - echo 'source build/lib/release.sh' >> kubernetes.sh
     - echo 'kube::build::verify_prereqs' >> kubernetes.sh
     - echo 'kube::build::build_image' >> kubernetes.sh
-    - export KUBE_DOCKER_REGISTRY="${CI_REGISTRY_IMAGE}"
-    - export KUBE_DOCKER_IMAGE_TAG="${CI_COMMIT_REF_SLUG}.${CI_PIPELINE_ID}.${CI_COMMIT_SHA_SHORT}"
+    # - export KUBE_DOCKER_REGISTRY="${CI_REGISTRY_IMAGE}"
+    # - export KUBE_DOCKER_IMAGE_TAG="${CI_COMMIT_REF_SLUG}.${CI_PIPELINE_ID}.${CI_COMMIT_SHA_SHORT}"
     - >
       if [ "$ARCH" == "arm64" ]; then
         echo 'ARCH set to arm64'
