@@ -44,7 +44,17 @@ compile:
         echo 'ARCH set to arm64'
         echo 'kube::build::run_build_command make all KUBE_BUILD_PLATFORMS=linux/arm64' >> kubernetes.sh
         echo 'kube::build::copy_output' >> kubernetes.sh
+        echo "sed -i -e '/ linux\/arm$/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
+        echo "sed -i -e '/ linux\/amd64/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
+        echo "sed -i -e '/ linux\/s390/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
+        echo "sed -i -e '/ linux\/386/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
+        echo "sed -i -e '/ linux\/ppc64le/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
+        echo "sed -i -e '/ darwin\/amd64/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
+        echo "sed -i -e '/ darwin\/386/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
+        echo "sed -i -e '/ windows\/386/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
+        echo "sed -i -e '/ windows\/amd64/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
         echo 'kube::release::build_server_images' >> kubernetes.sh
+        echo 'sleep 1000000' >> kubernetes.sh
       else
         echo 'Default to amd64 (Intel)'
         echo 'kube::build::run_build_command make all KUBE_BUILD_PLATFORMS=linux/amd64' >> kubernetes.sh
