@@ -37,45 +37,28 @@ compile:
     - echo 'source build/lib/release.sh' >> kubernetes.sh
     - echo 'kube::build::verify_prereqs' >> kubernetes.sh
     - echo 'kube::build::build_image' >> kubernetes.sh
-    # - export KUBE_DOCKER_REGISTRY="${CI_REGISTRY_IMAGE}"
-    # - export KUBE_DOCKER_IMAGE_TAG="${CI_COMMIT_REF_SLUG}.${CI_PIPELINE_ID}.${CI_COMMIT_SHA_SHORT}"
     - >
       if [ "$ARCH" == "arm64" ]; then
         echo 'ARCH set to arm64'
         echo 'kube::build::run_build_command make all KUBE_BUILD_PLATFORMS=linux/arm64' >> kubernetes.sh
         echo 'kube::build::copy_output' >> kubernetes.sh
-        echo "sed -i -e '/ linux\/arm$/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
-        echo "sed -i -e '/ linux\/amd64/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
-        echo "sed -i -e '/ linux\/s390/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
-        echo "sed -i -e '/ linux\/386/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
-        echo "sed -i -e '/ linux\/ppc64le/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
-        echo "sed -i -e '/ darwin\/amd64/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
-        echo "sed -i -e '/ darwin\/386/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
-        echo "sed -i -e '/ windows\/386/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
-        echo "sed -i -e '/ windows\/amd64/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
-        echo 'kube::release::build_server_images' >> kubernetes.sh
-        echo 'sleep 1000000' >> kubernetes.sh
       else
         echo 'Default to amd64 (Intel)'
         echo 'kube::build::run_build_command make all KUBE_BUILD_PLATFORMS=linux/amd64' >> kubernetes.sh
         echo 'kube::build::copy_output' >> kubernetes.sh
-        echo 'kube::release::build_server_images' >> kubernetes.sh
       fi
     #Run Build
     - chmod +x ./kubernetes.sh 
-    - sleep 1000000
     - ./kubernetes.sh
     - >
       if [ "$ARCH" == "arm64" ]; then
         echo 'ARCH set to arm64'
-        cp -a _output/dockerized/bin/linux/arm64 linux-arm64
         echo export KUBELET_ARTIFACT="$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/linux-arm64/kubelet >> release.env
         echo export KUBE_APISERVER_ARTIFACT="$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/linux-arm64/kube-apiserver >> release.env
         echo export KUBE_CONTROLLER_MANAGER_ARTIFACT="$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/linux-arm64/kube-controller-manager >> release.env
         echo export KUBE_SCHEDULER_ARTIFACT="$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/linux-arm64/kube-scheduler >> release.env
       else
         echo 'Default to amd64 (Intel)'
-        cp -a _output/dockerized/bin/linux/amd64 linux-amd64
         echo export KUBELET_ARTIFACT="$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/linux-amd64/kubelet >> release.env
         echo export KUBE_APISERVER_ARTIFACT="$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/linux-amd64/kube-apiserver >> release.env
         echo export KUBE_CONTROLLER_MANAGER_ARTIFACT="$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/linux-amd64/kube-controller-manager >> release.env
@@ -88,8 +71,7 @@ compile:
     expire_in: 1 weeks
     paths:
       - release.env
-      - linux-amd64
-      - linux-arm64
+      - _output/dockerized/bin/linux/
 
 container:
   image: crosscloudci/debian-docker
@@ -103,21 +85,31 @@ container:
     - docker login -u "gitlab-ci-token" -p "$CI_JOB_TOKEN" $CI_REGISTRY
     - >
       if [ "$ARCH" == "arm64" ]; then
-         docker push "$CI_REGISTRY_IMAGE/kube-apiserver-arm64:$KUBE_DOCKER_IMAGE_TAG"
-         docker push "$CI_REGISTRY_IMAGE/kube-controller-manager-arm64:$KUBE_DOCKER_IMAGE_TAG"
-         docker push "$CI_REGISTRY_IMAGE/kube-scheduler-arm64:$KUBE_DOCKER_IMAGE_TAG"
-         docker push "$CI_REGISTRY_IMAGE/kube-proxy-arm64:$KUBE_DOCKER_IMAGE_TAG"
-         docker push "$CI_REGISTRY_IMAGE/cloud-controller-manager-arm64:$KUBE_DOCKER_IMAGE_TAG"
-         echo export KUBE_APISERVER_IMAGE="$CI_REGISTRY_IMAGE/kube-apiserver-arm64" >> release.env
-         echo export KUBE_APISERVER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
-         echo export KUBE_CONTROLLER_MANAGER_IMAGE="$CI_REGISTRY_IMAGE/kube-controller-manager-arm64" >> release.env
-         echo export KUBE_CONTROLLER_MANAGER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
-         echo export KUBE_SCHEDULER_IMAGE="$CI_REGISTRY_IMAGE/kube-scheduler-arm64" >> release.env
-         echo export KUBE_SCHEDULER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
-         echo export KUBE_PROXY_IMAGE="$CI_REGISTRY_IMAGE/kube-proxy-arm64" >> release.env
-         echo export KUBE_PROXY_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
-         echo export CLOUD_CONTROLLER_IMAGE="$CI_REGISTRY_IMAGE/cloud-controller-manager-arm64" >> release.env
-         echo export CLOUD_CONTROLLER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
+         echo "sed -i -e '/ linux\/arm$/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
+         echo "sed -i -e '/ linux\/amd64/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
+         echo "sed -i -e '/ linux\/s390/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
+         echo "sed -i -e '/ linux\/386/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
+         echo "sed -i -e '/ linux\/ppc64le/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
+         echo "sed -i -e '/ darwin\/amd64/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
+         echo "sed -i -e '/ darwin\/386/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
+         echo "sed -i -e '/ windows\/386/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
+         echo "sed -i -e '/ windows\/amd64/ s/^/#/' hack/lib/golang.sh" >> kubernetes.sh
+
+         # docker push "$CI_REGISTRY_IMAGE/kube-apiserver-arm64:$KUBE_DOCKER_IMAGE_TAG"
+         # docker push "$CI_REGISTRY_IMAGE/kube-controller-manager-arm64:$KUBE_DOCKER_IMAGE_TAG"
+         # docker push "$CI_REGISTRY_IMAGE/kube-scheduler-arm64:$KUBE_DOCKER_IMAGE_TAG"
+         # docker push "$CI_REGISTRY_IMAGE/kube-proxy-arm64:$KUBE_DOCKER_IMAGE_TAG"
+         # docker push "$CI_REGISTRY_IMAGE/cloud-controller-manager-arm64:$KUBE_DOCKER_IMAGE_TAG"
+         # echo export KUBE_APISERVER_IMAGE="$CI_REGISTRY_IMAGE/kube-apiserver-arm64" >> release.env
+         # echo export KUBE_APISERVER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
+         # echo export KUBE_CONTROLLER_MANAGER_IMAGE="$CI_REGISTRY_IMAGE/kube-controller-manager-arm64" >> release.env
+         # echo export KUBE_CONTROLLER_MANAGER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
+         # echo export KUBE_SCHEDULER_IMAGE="$CI_REGISTRY_IMAGE/kube-scheduler-arm64" >> release.env
+         # echo export KUBE_SCHEDULER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
+         # echo export KUBE_PROXY_IMAGE="$CI_REGISTRY_IMAGE/kube-proxy-arm64" >> release.env
+         # echo export KUBE_PROXY_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
+         # echo export CLOUD_CONTROLLER_IMAGE="$CI_REGISTRY_IMAGE/cloud-controller-manager-arm64" >> release.env
+         # echo export CLOUD_CONTROLLER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
       else
          echo 'No ARCH set, defaulting to amd64'
          docker push "$CI_REGISTRY_IMAGE/kube-apiserver-amd64:$KUBE_DOCKER_IMAGE_TAG"
@@ -137,7 +129,18 @@ container:
          echo export CLOUD_CONTROLLER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
          echo export DEPLOYMENT_SHA="${CI_PIPELINE_ID}" >> release.env
       fi
-    -  cat release.env
+    # Write package script
+    - echo '#!/bin/bash' > kubernetes.sh
+    - echo 'set -o errexit' >> kubernetes.sh
+    - echo 'set -o nounset' >> kubernetes.sh
+    - echo 'set -o pipefail' >> kubernetes.sh
+    - echo 'source build/common.sh' >> kubernetes.sh
+    - echo 'source build/lib/release.sh' >> kubernetes.sh
+    - echo 'kube::build::verify_prereqs' >> kubernetes.sh
+    - echo 'kube::release::build_server_images' >> kubernetes.sh
+    - chmod +x ./kubernestes.sh
+    - ./kubernetes.sh
+    - cat release.env
   artifacts:
     name: "${CI_JOB_NAME}.${CI_PIPELINE_ID}.${CI_JOB_ID}"
     when: always
