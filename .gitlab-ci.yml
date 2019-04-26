@@ -76,8 +76,8 @@ compile:
       fi
     #Run Build
     - chmod +x ./kubernetes.sh 
-    - ./kubernetes.sh
     - sleep 1000000
+    - ./kubernetes.sh
     - >
       if [ "$ARCH" == "arm64" ]; then
         echo 'ARCH set to arm64'
