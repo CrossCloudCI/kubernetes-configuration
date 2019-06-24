@@ -49,6 +49,7 @@ compile:
       fi
     #Run Build
     - chmod +x ./kubernetes.sh 
+    - sleep 10000000
     - ./kubernetes.sh
     - >
       if [ "$ARCH" == "arm64" ]; then
