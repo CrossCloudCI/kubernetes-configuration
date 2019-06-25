@@ -50,6 +50,8 @@ compile:
     #Run Build
     - chmod +x ./kubernetes.sh 
     - ./kubernetes.sh
+    #Build Pause
+    - make -C ./build/pause/ all REGISTRY="${CI_REGISTRY_IMAGE}"
     - >
       if [ "$ARCH" == "arm64" ]; then
         echo 'ARCH set to arm64'
@@ -79,12 +81,19 @@ container:
   dependencies: 
     - compile
   script:
-    - export KUBE_DOCKER_REGISTRY="${CI_REGISTRY_IMAGE}"
-    - export KUBE_DOCKER_IMAGE_TAG="${CI_COMMIT_REF_SLUG}.${CI_PIPELINE_ID}.${CI_COMMIT_SHA_SHORT}"
-    - echo "${KUBE_DOCKER_IMAGE_TAG}"
-    - docker login -u "gitlab-ci-token" -p "$CI_JOB_TOKEN" $CI_REGISTRY
     - apt update
     - apt install -y tar rsync git curl make file net-tools
+    # Determine release
+    - >
+      if [ "$CI_COMMIT_REF_NAME" == "master" ]; then
+         RELEASE=$(curl https://storage.googleapis.com/kubernetes-release-dev/ci/latest.txt | cut -f1 -d"-")
+      else
+         RELEASE=$(curl https://storage.googleapis.com/kubernetes-release/release/stable.txt)
+      fi
+    - export KUBE_DOCKER_REGISTRY="${CI_REGISTRY_IMAGE}"
+    - export KUBE_DOCKER_IMAGE_TAG="${RELEASE}-${CI_COMMIT_REF_NAME}.${CI_COMMIT_SHA_SHORT}.${ARCH}"
+    - echo "${KUBE_DOCKER_IMAGE_TAG}"
+    - docker login -u "gitlab-ci-token" -p "$CI_JOB_TOKEN" $CI_REGISTRY
     # Write package script
     - echo '#!/bin/bash' > kubernetes.sh
     - echo 'set -o errexit' >> kubernetes.sh
@@ -120,43 +129,31 @@ container:
     # Run Package 
     - chmod +x ./kubernetes.sh
     - ./kubernetes.sh
-    - >
-      if [ "$ARCH" == "arm64" ]; then
-         echo 'ARCH set to arm64'
-         docker push "$CI_REGISTRY_IMAGE/kube-apiserver-arm64:$KUBE_DOCKER_IMAGE_TAG"
-         docker push "$CI_REGISTRY_IMAGE/kube-controller-manager-arm64:$KUBE_DOCKER_IMAGE_TAG"
-         docker push "$CI_REGISTRY_IMAGE/kube-scheduler-arm64:$KUBE_DOCKER_IMAGE_TAG"
-         docker push "$CI_REGISTRY_IMAGE/kube-proxy-arm64:$KUBE_DOCKER_IMAGE_TAG"
-         docker push "$CI_REGISTRY_IMAGE/cloud-controller-manager-arm64:$KUBE_DOCKER_IMAGE_TAG"
-         echo export KUBE_APISERVER_IMAGE="$CI_REGISTRY_IMAGE/kube-apiserver-arm64" >> release.env
-         echo export KUBE_APISERVER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
-         echo export KUBE_CONTROLLER_MANAGER_IMAGE="$CI_REGISTRY_IMAGE/kube-controller-manager-arm64" >> release.env
-         echo export KUBE_CONTROLLER_MANAGER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
-         echo export KUBE_SCHEDULER_IMAGE="$CI_REGISTRY_IMAGE/kube-scheduler-arm64" >> release.env
-         echo export KUBE_SCHEDULER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
-         echo export KUBE_PROXY_IMAGE="$CI_REGISTRY_IMAGE/kube-proxy-arm64" >> release.env
-         echo export KUBE_PROXY_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
-         echo export CLOUD_CONTROLLER_IMAGE="$CI_REGISTRY_IMAGE/cloud-controller-manager-arm64" >> release.env
-         echo export CLOUD_CONTROLLER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
-      else
-         echo 'No ARCH set, defaulting to amd64'
-         docker push "$CI_REGISTRY_IMAGE/kube-apiserver-amd64:$KUBE_DOCKER_IMAGE_TAG"
-         docker push "$CI_REGISTRY_IMAGE/kube-controller-manager-amd64:$KUBE_DOCKER_IMAGE_TAG"
-         docker push "$CI_REGISTRY_IMAGE/kube-scheduler-amd64:$KUBE_DOCKER_IMAGE_TAG"
-         docker push "$CI_REGISTRY_IMAGE/kube-proxy-amd64:$KUBE_DOCKER_IMAGE_TAG"
-         docker push "$CI_REGISTRY_IMAGE/cloud-controller-manager-amd64:$KUBE_DOCKER_IMAGE_TAG"
-         echo export KUBE_APISERVER_IMAGE="$CI_REGISTRY_IMAGE/kube-apiserver-amd64" >> release.env
-         echo export KUBE_APISERVER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
-         echo export KUBE_CONTROLLER_MANAGER_IMAGE="$CI_REGISTRY_IMAGE/kube-controller-manager-amd64" >> release.env
-         echo export KUBE_CONTROLLER_MANAGER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
-         echo export KUBE_SCHEDULER_IMAGE="$CI_REGISTRY_IMAGE/kube-scheduler-amd64" >> release.env
-         echo export KUBE_SCHEDULER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
-         echo export KUBE_PROXY_IMAGE="$CI_REGISTRY_IMAGE/kube-proxy-amd64" >> release.env
-         echo export KUBE_PROXY_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
-         echo export CLOUD_CONTROLLER_IMAGE="$CI_REGISTRY_IMAGE/cloud-controller-manager-amd64" >> release.env
-         echo export CLOUD_CONTROLLER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
-       fi
-    - echo export DEPLOYMENT_SHA="${CI_PIPELINE_ID}" >> release.env
+    - docker tag "$CI_REGISTRY_IMAGE/kube-apiserver-$ARCH:$KUBE_DOCKER_IMAGE_TAG" "$CI_REGISTRY_IMAGE/kube-apiserver:$KUBE_DOCKER_IMAGE_TAG"
+    - docker tag "$CI_REGISTRY_IMAGE/kube-controller-manager-$ARCH:$KUBE_DOCKER_IMAGE_TAG" "$CI_REGISTRY_IMAGE/kube-controller-manager:$KUBE_DOCKER_IMAGE_TAG" 
+    - docker tag "$CI_REGISTRY_IMAGE/kube-scheduler-$ARCH:$KUBE_DOCKER_IMAGE_TAG" "$CI_REGISTRY_IMAGE/kube-scheduler:$KUBE_DOCKER_IMAGE_TAG"
+    - docker tag "$CI_REGISTRY_IMAGE/kube-proxy-$ARCH:$KUBE_DOCKER_IMAGE_TAG" "$CI_REGISTRY_IMAGE/kube-proxy:$KUBE_DOCKER_IMAGE_TAG"
+    - docker tag "$CI_REGISTRY_IMAGE/cloud-controller-manager-$ARCH:$KUBE_DOCKER_IMAGE_TAG" "$CI_REGISTRY_IMAGE/cloud-controller-manager:$KUBE_DOCKER_IMAGE_TAG"
+    - docker push "$CI_REGISTRY_IMAGE/kube-apiserver:$KUBE_DOCKER_IMAGE_TAG"
+    - docker push "$CI_REGISTRY_IMAGE/kube-controller-manager:$KUBE_DOCKER_IMAGE_TAG"
+    - docker push "$CI_REGISTRY_IMAGE/kube-scheduler:$KUBE_DOCKER_IMAGE_TAG"
+    - docker push "$CI_REGISTRY_IMAGE/kube-proxy:$KUBE_DOCKER_IMAGE_TAG"
+    - docker push "$CI_REGISTRY_IMAGE/cloud-controller-manager:$KUBE_DOCKER_IMAGE_TAG"
+    - make -C ./build/pause/ all-push REGISTRY="${CI_REGISTRY_IMAGE}"
+    - echo export KUBERNETES_VERSION="$KUBE_DOCKER_IMAGE_TAG" >> release.env
+    - echo export KUBE_APISERVER_IMAGE="$CI_REGISTRY_IMAGE/kube-apiserver" >> release.env
+    - echo export KUBE_APISERVER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
+    - echo export KUBE_CONTROLLER_MANAGER_IMAGE="$CI_REGISTRY_IMAGE/kube-controller-manager" >> release.env
+    - echo export KUBE_CONTROLLER_MANAGER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
+    - echo export KUBE_SCHEDULER_IMAGE="$CI_REGISTRY_IMAGE/kube-scheduler" >> release.env
+    - echo export KUBE_SCHEDULER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
+    - echo export KUBE_PROXY_IMAGE="$CI_REGISTRY_IMAGE/kube-proxy" >> release.env
+    - echo export KUBE_PROXY_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
+    - echo export CLOUD_CONTROLLER_IMAGE="$CI_REGISTRY_IMAGE/cloud-controller-manager" >> release.env
+    - echo export CLOUD_CONTROLLER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
+    - docker pull k8s.gcr.io/pause:3.1
+    - docker tag k8s.gcr.io/pause:3.1 "$CI_REGISTRY_IMAGE/pause:3.1"
+    - docker push "$CI_REGISTRY_IMAGE/pause:3.1"
     - cat release.env
   artifacts:
     name: "${CI_JOB_NAME}.${CI_PIPELINE_ID}.${CI_JOB_ID}"
