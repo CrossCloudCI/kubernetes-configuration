@@ -50,6 +50,8 @@ compile:
     #Run Build
     - chmod +x ./kubernetes.sh 
     - ./kubernetes.sh
+    #Build Pause
+    - make -C ./build/pause/ container ARCH="$ARCH"
     - >
       if [ "$ARCH" == "arm64" ]; then
         echo 'ARCH set to arm64'
