@@ -51,7 +51,7 @@ compile:
     - chmod +x ./kubernetes.sh 
     - ./kubernetes.sh
     #Build Pause
-    - make -C ./build/pause/ all
+    - make -C ./build/pause/ all REGISTRY="${CI_REGISTRY_IMAGE}"
     - >
       if [ "$ARCH" == "arm64" ]; then
         echo 'ARCH set to arm64'
