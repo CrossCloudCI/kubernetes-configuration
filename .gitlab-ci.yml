@@ -91,7 +91,7 @@ container:
     - export KUBE_DOCKER_REGISTRY="docker.io/crosscloudci/kubernetes"
     - export KUBE_DOCKER_IMAGE_TAG="${RELEASE}-${CI_COMMIT_REF_NAME}.${CI_COMMIT_SHA_SHORT}.${ARCH}"
     - echo "${KUBE_DOCKER_IMAGE_TAG}"
-    - docker login -u "gitlab-ci-token" -p "$CI_JOB_TOKEN" $CI_REGISTRY
+    - docker login -u "$DOCKER_USER" -p "$DOCKER_TOKEN"
     # Write package script
     - echo '#!/bin/bash' > kubernetes.sh
     - echo 'set -o errexit' >> kubernetes.sh
