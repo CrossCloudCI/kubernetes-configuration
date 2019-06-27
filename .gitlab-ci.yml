@@ -91,7 +91,8 @@ container:
     - export KUBE_DOCKER_REGISTRY="$DOCKER_REGISTRY"
     - export KUBE_DOCKER_IMAGE_TAG="${RELEASE}-${CI_COMMIT_REF_NAME}.${CI_COMMIT_SHA_SHORT}.${ARCH}"
     - echo "${KUBE_DOCKER_IMAGE_TAG}"
-    - docker login -u "$DOCKER_USER" -p "$DOCKER_TOKEN" "$DOCKER_REGISTRY"
+    # - docker login -u "$DOCKER_USER" -p "$DOCKER_TOKEN" "$DOCKER_REGISTRY"
+    - mkdir ~/.docker && echo "$DOCKER_AUTH" > ~/.docker/config.json
     # Write package script
     - echo '#!/bin/bash' > kubernetes.sh
     - echo 'set -o errexit' >> kubernetes.sh
