@@ -140,7 +140,7 @@ container:
     #Publish pause image
     - make -C ./build/pause/ all-push REGISTRY="${KUBE_DOCKER_REGISTRY}"
     #Push dummy coredns image
-    - docker pull coredns:1.2.6
+    - docker pull coredns/coredns:1.2.6
     - docker tag coredns/coredns:1.2.6 crosscloudci/coredns:1.2.6
     - docker push crosscloudci/coredns:1.2.6
     - echo export KUBERNETES_VERSION="$KUBE_DOCKER_IMAGE_TAG" >> release.env
