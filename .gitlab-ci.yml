@@ -143,6 +143,9 @@ container:
     - docker pull coredns/coredns:1.2.6
     - docker tag coredns/coredns:1.2.6 crosscloudci/coredns:1.2.6
     - docker push crosscloudci/coredns:1.2.6
+    - docker pull coredns/coredns:1.3.1
+    - docker tag coredns/coredns:1.3.1 crosscloudci/coredns:1.3.1
+    - docker push crosscloudci/coredns:1.3.1
     - echo export KUBERNETES_VERSION="$KUBE_DOCKER_IMAGE_TAG" >> release.env
     - echo export KUBE_APISERVER_IMAGE="$KUBE_DOCKER_REGISTRY/kube-apiserver" >> release.env
     - echo export KUBE_APISERVER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
