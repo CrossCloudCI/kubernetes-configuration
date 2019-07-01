@@ -91,7 +91,6 @@ container:
     - export KUBE_DOCKER_REGISTRY="$DOCKER_REGISTRY"
     - export KUBE_DOCKER_IMAGE_TAG="${RELEASE}-${CI_COMMIT_REF_NAME}.${CI_COMMIT_SHA_SHORT}.${ARCH}"
     - echo "${KUBE_DOCKER_IMAGE_TAG}"
-    # - docker login -u "$DOCKER_USER" -p "$DOCKER_TOKEN" "$DOCKER_REGISTRY"
     - mkdir ~/.docker && echo "$DOCKER_AUTH" > ~/.docker/config.json
     # Write package script
     - echo '#!/bin/bash' > kubernetes.sh
@@ -138,7 +137,12 @@ container:
     - docker push "$KUBE_DOCKER_REGISTRY/kube-scheduler:$KUBE_DOCKER_IMAGE_TAG"
     - docker push "$KUBE_DOCKER_REGISTRY/kube-proxy:$KUBE_DOCKER_IMAGE_TAG"
     - docker push "$KUBE_DOCKER_REGISTRY/cloud-controller-manager:$KUBE_DOCKER_IMAGE_TAG"
+    #Publish pause image
     - make -C ./build/pause/ all-push REGISTRY="${KUBE_DOCKER_REGISTRY}"
+    #Push dummy coredns image
+    - docker pull coredns:1.2.6
+    - docker tag coredns:1.2.6 crosscloudci/coredns:1.2.6
+    - docker push crosscloudci/coredns:1.2.6
     - echo export KUBERNETES_VERSION="$KUBE_DOCKER_IMAGE_TAG" >> release.env
     - echo export KUBE_APISERVER_IMAGE="$KUBE_DOCKER_REGISTRY/kube-apiserver" >> release.env
     - echo export KUBE_APISERVER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
