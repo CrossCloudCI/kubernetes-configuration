@@ -54,20 +54,23 @@ compile:
       if [ "$ARCH" == "arm64" ]; then
         echo 'ARCH set to arm64'
         echo export KUBELET_ARTIFACT="$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/_output/dockerized/bin/linux/arm64/kubelet >> release.env
-        echo export HYPERKUBE_ARTIFACT="$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/_output/dockerized/bin/linux/arm64/hyperkube >> release.env
-        echo export HYPERKUBE_SHA256="$(sha256sum "$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/_output/dockerized/bin/linux/arm64/hyperkube)" >> release.env
         echo export KUBE_APISERVER_ARTIFACT="$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/_output/dockerized/bin/linux/arm64/kube-apiserver >> release.env
         echo export KUBE_CONTROLLER_MANAGER_ARTIFACT="$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/_output/dockerized/bin/linux/arm64/kube-controller-manager >> release.env
         echo export KUBE_SCHEDULER_ARTIFACT="$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/_output/dockerized/bin/linux/arm64/kube-scheduler >> release.env
       else
         echo 'Default to amd64 (Intel)'
         echo export KUBELET_ARTIFACT="$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/_output/dockerized/bin/linux/amd64/kubelet >> release.env
-        echo export HYPERKUBE_ARTIFACT="$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/_output/dockerized/bin/linux/amd64/hyperkube >> release.env
-        echo export HYPERKUBE_SHA256="$(sha256sum "$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/_output/dockerized/bin/linux/amd64/hyperkube)" >> release.env
         echo export KUBE_APISERVER_ARTIFACT="$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/_output/dockerized/bin/linux/amd64/kube-apiserver >> release.env
         echo export KUBE_CONTROLLER_MANAGER_ARTIFACT="$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/_output/dockerized/bin/linux/amd64/kube-controller-manager >> release.env
         echo export KUBE_SCHEDULER_ARTIFACT="$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/_output/dockerized/bin/linux/amd64/kube-scheduler >> release.env
       fi
+    - echo "kube_version: $RELEASE" >> kubespray.env
+    - echo "hyperkube_download_url: $BASE_URL/kubernetes/kubernetes/-/jobs/$CI_JOB_ID/artifacts/raw/_output/dockerized/bin/linux/$ARCH/hyperkube" >> kubespray.env
+    - echo "hyperkube_checksums:" >> kubespray.env
+    - echo "  $ARCH:" >> kubespray.env
+    - echo "  $ARCH:" >> kubespray.env
+    - echo "      $RELEASE: $(sha256sum $BASE_URL/kubernetes/kubernetes/-/jobs/$CI_JOB_ID/artifacts/raw/_output/dockerized/bin/linux/$ARCH/hyperkube)" >> kubespray.env
+
     
   artifacts:
     name: "${CI_JOB_NAME}.${CI_PIPELINE_ID}.${CI_JOB_ID}"
@@ -75,6 +78,7 @@ compile:
     expire_in: 1 weeks
     paths:
       - release.env
+      - kubespray.env
       - _output/dockerized/bin/linux/
 
 container:
@@ -162,13 +166,17 @@ container:
     - echo export CLOUD_CONTROLLER_IMAGE="$KUBE_DOCKER_REGISTRY/cloud-controller-manager" >> release.env
     - echo export CLOUD_CONTROLLER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
     - echo export DEPLOYMENT_SHA="${CI_PIPELINE_ID}" >> release.env
+    - echo "kube_image_repo: $KUBE_DOCKER_REGISTRY" >> kubespray.env
+    - echo "kube_image_version: $KUBE_DOCKER_IMAGE_TAG" >> kubespray.env 
     - cat release.env
+    - cat kubespray.env
   artifacts:
     name: "${CI_JOB_NAME}.${CI_PIPELINE_ID}.${CI_JOB_ID}"
     when: always
     expire_in: 1 weeks
     paths:
       - release.env
+      - kubespray.env
 
 Dashboard:
   image: crosscloudci/debian-go
