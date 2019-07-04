@@ -63,7 +63,7 @@ compile:
         echo 'Default to amd64 (Intel)'
         echo export KUBELET_ARTIFACT="$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/_output/dockerized/bin/linux/amd64/kubelet >> release.env
         echo export HYPERKUBE_ARTIFACT="$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/_output/dockerized/bin/linux/amd64/hyperkube >> release.env
-        echo export HYPERKUBE_SHA256="$(sha256 "$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/_output/dockerized/bin/linux/amd64/hyperkube)" >> release.env
+        echo export HYPERKUBE_SHA256="$(sha256sum "$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/_output/dockerized/bin/linux/amd64/hyperkube)" >> release.env
         echo export KUBE_APISERVER_ARTIFACT="$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/_output/dockerized/bin/linux/amd64/kube-apiserver >> release.env
         echo export KUBE_CONTROLLER_MANAGER_ARTIFACT="$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/_output/dockerized/bin/linux/amd64/kube-controller-manager >> release.env
         echo export KUBE_SCHEDULER_ARTIFACT="$BASE_URL"/kubernetes/kubernetes/-/jobs/${CI_JOB_ID}/artifacts/raw/_output/dockerized/bin/linux/amd64/kube-scheduler >> release.env
