@@ -69,7 +69,7 @@ compile:
     - echo "hyperkube_checksums:" >> kubespray.env
     - echo "  $ARCH:" >> kubespray.env
     - echo "  $ARCH:" >> kubespray.env
-    - echo "      $RELEASE: $(sha256sum $BASE_URL/kubernetes/kubernetes/-/jobs/$CI_JOB_ID/artifacts/raw/_output/dockerized/bin/linux/$ARCH/hyperkube)" >> kubespray.env
+    - echo "      $RELEASE: $(sha256sum _output/dockerized/bin/linux/$ARCH/hyperkube)" >> kubespray.env
 
     
   artifacts:
