@@ -166,7 +166,7 @@ container:
     - >
       echo "  $ARCH:" >> kubespray.env
     - >
-      echo "      $RELEASE: $(sha256sum _output/dockerized/bin/linux/$ARCH/hyperkube)" >> kubespray.env
+      echo "      $RELEASE: $(sha256sum _output/dockerized/bin/linux/$ARCH/hyperkube | awk '{ print $1 }')" >> kubespray.env
     - >
       echo "kube_version: $RELEASE" >> kubespray.env
     - >
