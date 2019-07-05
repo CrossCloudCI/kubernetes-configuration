@@ -91,6 +91,7 @@ container:
       else
          RELEASE=$(curl https://storage.googleapis.com/kubernetes-release/release/stable.txt)
       fi
+    - RELEASE_STABLE=$(curl https://storage.googleapis.com/kubernetes-release/release/stable.txt)
     - export KUBE_DOCKER_REGISTRY="$DOCKER_REGISTRY"
     - export KUBE_DOCKER_IMAGE_TAG="${RELEASE}-${CI_COMMIT_REF_NAME}.${CI_COMMIT_SHA_SHORT}.${ARCH}"
     - echo "${KUBE_DOCKER_IMAGE_TAG}"
@@ -166,9 +167,9 @@ container:
     - >
       echo "  $ARCH:" >> kubespray.env
     - >
-      echo "    $RELEASE: $(sha256sum _output/dockerized/bin/linux/$ARCH/hyperkube | awk '{ print $1 }')" >> kubespray.env
+      echo "    $RELEASE_STABLE: $(sha256sum _output/dockerized/bin/linux/$ARCH/hyperkube | awk '{ print $1 }')" >> kubespray.env
     - >
-      echo "kube_version: $RELEASE" >> kubespray.env
+      echo "kube_version: $RELEASE_STABLE" >> kubespray.env
     - >
       echo "kube_image_repo: $KUBE_DOCKER_REGISTRY" >> kubespray.env
     - >
