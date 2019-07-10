@@ -162,6 +162,7 @@ container:
     - echo export CLOUD_CONTROLLER_IMAGE="$KUBE_DOCKER_REGISTRY/cloud-controller-manager" >> release.env
     - echo export CLOUD_CONTROLLER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
     - echo export DEPLOYMENT_SHA="${CI_PIPELINE_ID}" >> release.env
+    - echo export KUBERNETES_SHA="${CI_COMMIT_SHA}" >> release.env
     - >
       echo "hyperkube_checksums:" >> kubespray.env
     - >
