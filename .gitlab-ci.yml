@@ -150,6 +150,11 @@ container:
     - docker pull coredns/coredns:1.3.1
     - docker tag coredns/coredns:1.3.1 crosscloudci/coredns:1.3.1
     - docker push crosscloudci/coredns:1.3.1
+    #Publish k8s-dns-node-cache/arm64 image
+    - git clone https://github.com/kubernetes/dns.git
+    - cd dns
+    - make all, build CONTAINER_BINARIES=node-cache REGISTRY="$KUBE_DOCKER_REGISTRY" IMAGES="" ARCH="$ARCH" 
+    - cd -
     - echo export KUBERNETES_VERSION="$KUBE_DOCKER_IMAGE_TAG" >> release.env
     - echo export KUBE_APISERVER_IMAGE="$KUBE_DOCKER_REGISTRY/kube-apiserver" >> release.env
     - echo export KUBE_APISERVER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
