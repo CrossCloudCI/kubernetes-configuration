@@ -153,6 +153,7 @@ container:
     #Publish k8s-dns-node-cache/arm64 image
     - git clone https://github.com/kubernetes/dns.git
     - cd dns
+    - pwd && sleep 10000000
     - make all, build CONTAINER_BINARIES=node-cache REGISTRY="$KUBE_DOCKER_REGISTRY" IMAGES="" ARCH="$ARCH" 
     - cd -
     - echo export KUBERNETES_VERSION="$KUBE_DOCKER_IMAGE_TAG" >> release.env
