@@ -83,7 +83,7 @@ container:
     - compile
   script:
     - apt update
-    - apt install -y tar rsync git curl make file net-tools
+    - apt install -y tar rsync git curl make file net-tools xz-utils
     # Determine release
     - >
       if [ "$CI_COMMIT_REF_NAME" == "master" ]; then
@@ -142,7 +142,7 @@ container:
     - docker push "$KUBE_DOCKER_REGISTRY/kube-proxy:$KUBE_DOCKER_IMAGE_TAG"
     - docker push "$KUBE_DOCKER_REGISTRY/cloud-controller-manager:$KUBE_DOCKER_IMAGE_TAG"
     #Publish pause image
-    # - make -C ./build/pause/ all-push REGISTRY="${KUBE_DOCKER_REGISTRY}"
+    - make -C ./build/pause/ all-push REGISTRY="${KUBE_DOCKER_REGISTRY}"
     #Push dummy coredns image
     - docker pull coredns/coredns:1.2.6
     - docker tag coredns/coredns:1.2.6 crosscloudci/coredns:1.2.6
@@ -153,7 +153,6 @@ container:
     #Publish k8s-dns-node-cache/arm64 image
     - git clone https://github.com/kubernetes/dns.git
     - cd dns
-    - sleep 10000000
     - make containers CONTAINER_BINARIES=node-cache REGISTRY="$KUBE_DOCKER_REGISTRY" ARCH="$ARCH" 
     - docker push crosscloudci/k8s-dns-node-cache-"$ARCH:$(git describe --tags --always --dirty)"
     - echo export DNS_NODE_CACHE_IMAGE="$KUBE_DOCKER_REGISTRY/k8s-dns-node-cache-$ARCH" >> release.env
