@@ -77,7 +77,7 @@ compile:
       - _output/dockerized/bin/linux/
 
 container:
-  image: crosscloudci/debian-docker
+  image: crosscloudci/debian-docker-go
   stage: Package
   dependencies: 
     - compile
