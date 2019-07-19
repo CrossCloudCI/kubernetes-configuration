@@ -142,7 +142,7 @@ container:
     - docker push "$KUBE_DOCKER_REGISTRY/kube-proxy:$KUBE_DOCKER_IMAGE_TAG"
     - docker push "$KUBE_DOCKER_REGISTRY/cloud-controller-manager:$KUBE_DOCKER_IMAGE_TAG"
     #Publish pause image
-    - make -C ./build/pause/ all-push REGISTRY="${KUBE_DOCKER_REGISTRY}"
+    # - make -C ./build/pause/ all-push REGISTRY="${KUBE_DOCKER_REGISTRY}"
     #Push dummy coredns image
     - docker pull coredns/coredns:1.2.6
     - docker tag coredns/coredns:1.2.6 crosscloudci/coredns:1.2.6
