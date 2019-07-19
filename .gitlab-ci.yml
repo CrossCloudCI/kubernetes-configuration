@@ -84,14 +84,10 @@ container:
   script:
     - apt update
     - apt install -y tar rsync git curl make file net-tools xz-utils
-    # Determine release
-    - >
-      if [ "$CI_COMMIT_REF_NAME" == "master" ]; then
-         RELEASE=$(curl https://storage.googleapis.com/kubernetes-release-dev/ci/latest.txt | cut -f1 -d"-")
-      else
-         RELEASE=$(curl https://storage.googleapis.com/kubernetes-release/release/stable.txt)
-      fi
-    - RELEASE_STABLE=$(curl https://storage.googleapis.com/kubernetes-release/release/stable.txt)
+    # Set Kubespray Release
+    - RELEASE_STABLE="v1.15.0"
+    # Determine actual release
+    - RELEASE="$(git describe --tags --always --dirty | cut -f1 -d"-")"
     - export KUBE_DOCKER_REGISTRY="$DOCKER_REGISTRY"
     - export KUBE_DOCKER_IMAGE_TAG="${RELEASE}-${CI_COMMIT_REF_NAME}.${CI_COMMIT_SHA_SHORT}.${ARCH}"
     - echo "${KUBE_DOCKER_IMAGE_TAG}"
@@ -155,12 +151,14 @@ container:
     - cd dns
     - make containers CONTAINER_BINARIES=node-cache REGISTRY="$KUBE_DOCKER_REGISTRY" ARCH="$ARCH" 
     - docker push crosscloudci/k8s-dns-node-cache-"$ARCH:$(git describe --tags --always --dirty)"
+    - DNS_GIT_VERSION="$(git describe --tags --always --dirty)"
+    - cd -
     - echo export DNS_NODE_CACHE_IMAGE="$KUBE_DOCKER_REGISTRY/k8s-dns-node-cache-$ARCH" >> release.env
-    - echo export DNS_NODE_CACHE_TAG="$(git describe --tags --always --dirty)" >> release.env
+    - echo export DNS_NODE_CACHE_TAG="$DNS_GIT_VERSION" >> release.env
     - >
       echo "nodelocaldns_image_repo: $KUBE_DOCKER_REGISTRY/k8s-dns-node-cache-$ARCH" >> kubespray.env
-      echo "nodelocaldns_image_tag: $(git describe --tags --always --dirty)" >> kubespray.env
-    - cd -
+    - >
+      echo "nodelocaldns_image_tag: $DNS_GIT_VERSION" >> kubespray.env
     - echo export KUBERNETES_VERSION="$KUBE_DOCKER_IMAGE_TAG" >> release.env
     - echo export KUBE_APISERVER_IMAGE="$KUBE_DOCKER_REGISTRY/kube-apiserver" >> release.env
     - echo export KUBE_APISERVER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
