@@ -149,6 +149,7 @@ container:
     #Publish k8s-dns-node-cache/arm64 image
     - git clone https://github.com/kubernetes/dns.git
     - cd dns
+    - sed -i "15s|.*|FROM ARG_FROM|" ./Dockerfile.node-cache
     - make containers CONTAINER_BINARIES=node-cache REGISTRY="$KUBE_DOCKER_REGISTRY" ARCH="$ARCH" 
     - docker push crosscloudci/k8s-dns-node-cache-"$ARCH:$(git describe --tags --always --dirty)"
     - DNS_GIT_VERSION="$(git describe --tags --always --dirty)"
