@@ -131,12 +131,10 @@ container:
     - docker tag "$KUBE_DOCKER_REGISTRY/kube-controller-manager-$ARCH:$KUBE_DOCKER_IMAGE_TAG" "$KUBE_DOCKER_REGISTRY/kube-controller-manager:$KUBE_DOCKER_IMAGE_TAG" 
     - docker tag "$KUBE_DOCKER_REGISTRY/kube-scheduler-$ARCH:$KUBE_DOCKER_IMAGE_TAG" "$KUBE_DOCKER_REGISTRY/kube-scheduler:$KUBE_DOCKER_IMAGE_TAG"
     - docker tag "$KUBE_DOCKER_REGISTRY/kube-proxy-$ARCH:$KUBE_DOCKER_IMAGE_TAG" "$KUBE_DOCKER_REGISTRY/kube-proxy:$KUBE_DOCKER_IMAGE_TAG"
-    - docker tag "$KUBE_DOCKER_REGISTRY/cloud-controller-manager-$ARCH:$KUBE_DOCKER_IMAGE_TAG" "$KUBE_DOCKER_REGISTRY/cloud-controller-manager:$KUBE_DOCKER_IMAGE_TAG"
     - docker push "$KUBE_DOCKER_REGISTRY/kube-apiserver:$KUBE_DOCKER_IMAGE_TAG"
     - docker push "$KUBE_DOCKER_REGISTRY/kube-controller-manager:$KUBE_DOCKER_IMAGE_TAG"
     - docker push "$KUBE_DOCKER_REGISTRY/kube-scheduler:$KUBE_DOCKER_IMAGE_TAG"
     - docker push "$KUBE_DOCKER_REGISTRY/kube-proxy:$KUBE_DOCKER_IMAGE_TAG"
-    - docker push "$KUBE_DOCKER_REGISTRY/cloud-controller-manager:$KUBE_DOCKER_IMAGE_TAG"
     #Publish pause image
     - make -C ./build/pause/ all-push REGISTRY="${KUBE_DOCKER_REGISTRY}"
     #Push dummy coredns image
@@ -175,8 +173,6 @@ container:
     - echo export KUBE_SCHEDULER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
     - echo export KUBE_PROXY_IMAGE="$KUBE_DOCKER_REGISTRY/kube-proxy" >> release.env
     - echo export KUBE_PROXY_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
-    - echo export CLOUD_CONTROLLER_IMAGE="$KUBE_DOCKER_REGISTRY/cloud-controller-manager" >> release.env
-    - echo export CLOUD_CONTROLLER_TAG="$KUBE_DOCKER_IMAGE_TAG" >> release.env
     - echo export DEPLOYMENT_SHA="${CI_PIPELINE_ID}" >> release.env
     - echo export KUBERNETES_SHA="${CI_COMMIT_SHA}" >> release.env
     - >
